@@ -190,6 +190,26 @@ allmetrics: html
 update: install
 	@. $(VENV); .sphinx/update_sp.py
 
+# Generate a release note.
+# Usage: make release-note VERSION=1.29.0
+#   Add OVERWRITE=1 to replace an existing file.
+#   Add DRY_RUN=1  to preview without writing.
+#   Add NO_LP=1    to skip Launchpad bug fetching.
+VERSION  ?=
+OVERWRITE ?=
+DRY_RUN  ?=
+NO_LP    ?=
+
+release-note:
+	@test -n "$(VERSION)" || (echo "ERROR: VERSION is required. Usage: make release-note VERSION=1.29.0" && exit 1)
+	@. $(VENV); python3 scripts/generate_release_note.py \
+		--version "$(VERSION)" \
+		$(if $(OVERWRITE),--overwrite) \
+		$(if $(DRY_RUN),--dry-run) \
+		$(if $(NO_LP),--no-launchpad)
+
+.PHONY: release-note
+
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %:

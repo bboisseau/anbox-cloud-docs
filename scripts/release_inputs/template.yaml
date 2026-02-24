@@ -1,0 +1,110 @@
+# ---------------------------------------------------------------------------
+# Release input template for Anbox Cloud release notes
+#
+# Copy this file to scripts/release_inputs/<version>.yaml  (e.g. 1.30.0.yaml)
+# and fill in the sections below, then run:
+#
+#   make release-note VERSION=1.30.0
+#   # or
+#   python3 scripts/generate_release_note.py --version 1.30.0
+#
+# Fields marked REQUIRED must be provided.
+# Fields marked OPTIONAL can be left blank / empty list.
+# ---------------------------------------------------------------------------
+
+# REQUIRED ─ must match the version you pass to --version
+version: "X.Y.Z"
+
+# REQUIRED ─ "minor" (X.Y.0) or "patch" (X.Y.1 / X.Y.2 / …)
+release_type: minor
+
+
+# ---------------------------------------------------------------------------
+# New features & improvements
+# REQUIRED if minor release; OPTIONAL for patch releases
+# Each entry becomes a ### sub-section under "New features & improvements".
+# The 'body' field supports full Markdown.
+# ---------------------------------------------------------------------------
+features:
+  - title: "Feature title"
+    body: |
+      One or two paragraphs describing the feature.
+      Include links to how-to guides or API reference where useful.
+
+  - title: "Other"
+    body: |
+      * The Android WebView has been updated to [X.Y.Z](https://chromereleases.googleblog.com/...).
+      * The WebRTC version has been updated to [NNNN](https://chromium.googlesource.com/...).
+
+
+# ---------------------------------------------------------------------------
+# Removed functionality
+# OPTIONAL – leave as "" or omit entirely if nothing was removed.
+# ---------------------------------------------------------------------------
+removed: >
+  There are no removed functionalities in this release.
+
+
+# ---------------------------------------------------------------------------
+# Deprecations
+# OPTIONAL – omit or leave blank if no deprecations.
+# ---------------------------------------------------------------------------
+deprecations: ""
+# Example:
+# deprecations: |
+#   * The `legacy-etcd` charm is deprecated and will be removed in 1.35.
+
+
+# ---------------------------------------------------------------------------
+# Known issues
+# The standard Launchpad open-bugs link is always added automatically.
+# Use 'known_issues_extra' for *additional* paragraphs below that link.
+# OPTIONAL
+# ---------------------------------------------------------------------------
+known_issues_extra: ""
+# Example:
+# known_issues_extra: |
+#   The security patch for CVE-XXXX-YYYYY is not included in this release
+#   and will be included in X.Y.1.
+
+
+# ---------------------------------------------------------------------------
+# CVEs
+# OPTIONAL – leave as [] if there are no CVEs.
+# ---------------------------------------------------------------------------
+cves: []
+# Example:
+# cves:
+#   - id: "CVE-2026-12345"
+#     url: "https://redirect.github.com/org/repo/security/advisories/GHSA-xxxx"
+#     component: "AMS"
+#   - id: "CVE-2026-99999"
+#     url: "https://www.cve.org/CVERecord?id=CVE-2026-99999"
+#     component: "Anbox-cloud-charms"
+
+
+# ---------------------------------------------------------------------------
+# Bug fixes
+# The script auto-fetches bugs from the Launchpad milestone matching 'version'.
+# Use 'extra_bugs' to add bugs that are NOT on Launchpad, or to add private
+# bugs with a custom description.
+# OPTIONAL
+# ---------------------------------------------------------------------------
+extra_bugs: []
+# Example:
+# extra_bugs:
+#   - number: "2099999"
+#     url: "https://bugs.launchpad.net/anbox-cloud/+bug/2099999"
+#     description: "Some fix not on the Launchpad milestone."
+
+
+# ---------------------------------------------------------------------------
+# Upgrade instructions
+# The canonical upgrade instructions link is always included automatically.
+# Use 'upgrade_note' for extra paragraphs appended after the standard text.
+# OPTIONAL
+# ---------------------------------------------------------------------------
+upgrade_note: ""
+# Example:
+# upgrade_note: |
+#   Before upgrading, ensure you have migrated away from the legacy etcd charm.

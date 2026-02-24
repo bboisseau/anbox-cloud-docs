@@ -1,0 +1,88 @@
+name: Generate release note
+
+# Trigger manually from the GitHub Actions UI.
+# Select the branch that contains the release_inputs/<version>.yaml file
+# before running.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 1.29.0)"
+        required: true
+        type: string
+      overwrite:
+        description: "Overwrite the output file if it already exists"
+        required: false
+        default: false
+        type: boolean
+      no_launchpad:
+        description: "Skip Launchpad bug fetching"
+        required: false
+        default: false
+        type: boolean
+      open_pr:
+        description: "Open a pull request with the generated file"
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install pyyaml
+          # Install any extra deps the docs repo needs for scripts
+          if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
+
+      - name: Generate release note
+        run: |
+          python3 scripts/generate_release_note.py \
+            --version "${{ inputs.version }}" \
+            ${{ inputs.overwrite && '--overwrite' || '' }} \
+            ${{ inputs.no_launchpad && '--no-launchpad' || '' }}
+
+      - name: Show diff
+        run: git diff --stat HEAD
+
+      - name: Commit and open pull request
+        if: ${{ inputs.open_pr }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "docs: add release note for ${{ inputs.version }}"
+          branch: "release-note/${{ inputs.version }}"
+          title: "Release note: ${{ inputs.version }}"
+          body: |
+            Auto-generated release note for Anbox Cloud ${{ inputs.version }}.
+
+            **Review checklist**
+            - [ ] New features & improvements are complete and accurate
+            - [ ] Component versions link is correct
+            - [ ] Bug fixes list matches LP milestone
+            - [ ] CVEs are correct
+            - [ ] Removed functionality / deprecations are up to date
+            - [ ] Upgrade instructions are correct
+          labels: "release-note"
+          draft: true
+
+      - name: Upload generated file (no PR)
+        if: ${{ !inputs.open_pr }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "release-note-${{ inputs.version }}"
+          path: "reference/release-notes/${{ inputs.version }}.md"
